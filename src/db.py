@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -13,3 +14,10 @@ class User(db.Model):
             "password": self.password,
             "gender" : self.gender
         }
+
+class Note(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    note_locked = db.Column(db.String)
+    title = db.Column(db.String)
+    content = db.Column(db.String)
