@@ -21,3 +21,19 @@ class Note(db.Model):
     note_locked = db.Column(db.String)
     title = db.Column(db.String)
     content = db.Column(db.String)
+
+    def serialize_for_home(self):
+        return {
+            "title": self.title,
+            "content": self.content,
+            "date_created" : self.date_created
+        }
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "note_locked": self.note_locked,
+            "title": self.title,
+            "content": self.content,
+            "date_created" : self.date_created
+        }
