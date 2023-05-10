@@ -25,6 +25,9 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
 
+# Register blueprints
+app.register_blueprint(users_bp)
+app.register_blueprint(notes_bp)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5002)
