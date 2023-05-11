@@ -17,3 +17,16 @@ def get_all_users():
 def get_user(user_id):
     the_user = User.query.filter_by(id=user_id).first() 
     return the_user.serialize()
+
+
+@users_bp.delete("/<int:user_id>/")
+def delete_user(user_id):
+    the_user = User.query.filter_by(id=user_id).first() 
+    if not the_user:
+        return "There was a problem deleting the user. Try again."
+
+    User.query.filter_by(id=user_id).delete()
+
+    db.session.commit()
+
+    return "User deleted successfully, have a nice day"
