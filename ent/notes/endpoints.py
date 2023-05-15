@@ -24,7 +24,23 @@ def get_note(note_id):
     the_note = Note.query.filter_by(id=note_id).first() 
     return the_note.serialize()
 
+@notes_bp.post("/")
+def create_note():
+    body = json.loads(request.data)
+    
+    title = body.get('title')
+    content = body.get('content')
+    note_locked = body.get('note_locked')
 
+    new_note = Note(title=title, content=content, note_locked=note_locked)
+
+    db.session.add(new_note)
+    db.session.commit()
+    db.session.refresh(new_note)
+
+    return "Note created successfully"
+
+    
 @notes_bp.put("/<int:note_id>")
 def update_note(note_id):
     the_note = Note.query.filter_by(id=note_id).first() 
@@ -48,3 +64,17 @@ def update_note(note_id):
     db.session.refresh(the_note)
 
     return "Your note was successfully updated"
+
+
+@notes_bp.delete("/<int:note_id>")
+def delete_note(note_id):
+    the_note = Note.query.filter_by(id=note_id).first() 
+
+    if not the_note:
+        return "Sorry, you are attempting to delete the wrong note. Try again."
+
+    Note.query.filter_by(id=note_id).delete()
+
+    db.session.commit()
+
+    return "Deleted successfully, have a nice day"
