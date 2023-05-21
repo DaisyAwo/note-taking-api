@@ -1,8 +1,11 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, make_response
 from db import db, User, Note
 import json
 
 from core.security import bcrypt
+
+from flask_jwt_extended import JWTManager
+from flask_jwt_extended import create_access_token
 
 users_bp = Blueprint("users_blueprint", __name__, url_prefix="/users" )
 
@@ -11,6 +14,7 @@ users_bp = Blueprint("users_blueprint", __name__, url_prefix="/users" )
 def get_all_users():
     all_users: list[User] = User.query.all()
     return [user.serialize() for user in all_users]
+
 
 @users_bp.post("/login/")
 def user_login():
@@ -32,14 +36,22 @@ def user_login():
     user_notes = the_user.notes
     populate = [note.serialize_for_home() for note in user_notes]
 
+    access_token = create_access_token(identity=name)
+
     msg = "Success logging in. Here are all your notes :)" 
 
     if not populate:
         return "Success logging in. Please create some notes to get started :)"
 
-    return {msg: populate} 
-    
+    response = {
+        "access_token": access_token,
+        "message":  msg,
+        "notes": populate
+    }
 
+    return make_response((response)), 200
+    
+ 
 @users_bp.post("/")
 def create_user():
     body = json.loads(request.data)
@@ -122,4 +134,4 @@ def user_note(user_id):
     the_user.notes.append(the_note)
     db.session.commit()
 
-    return "Successfully added note to user"
+    return "Success"
